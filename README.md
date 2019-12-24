@@ -24,7 +24,7 @@ HDFS是分布式文件系统
 单价		vs 横跨n个机器  
 
 # HDFS assumptions and goals
-hadrware failure  
-	blocksize = 128M  
-	block 存在不同机器上， 3 copies  
-streaming data access  
+1） hadrware failure  
+*	*blocksize = 128M  
+*	*block 存在不同机器上， 3 copies  
+2） streaming data access  
