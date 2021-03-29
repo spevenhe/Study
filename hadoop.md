@@ -54,3 +54,11 @@ FSEditlog:  文件树上的操作日志
 FSNamesystem: HDFS文件系统管理 
 
 
+# 思路二
+Hadoop直接提供了查找datanode信息的指令fsck [8]
+
+$hdfs fsck /input -files -blocks -locations -racks
+files 代表检出所有文件状态
+blocks 代表打印文件的block报告
+locations代表打印出文件存放的datanode（分成多少文件块就打印出多少条信息）
+racks代表打印出存放的机架位置
