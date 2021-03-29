@@ -74,8 +74,23 @@ buffer 超时了
  Flink 1.10 及以后的版本直接通过配置参数 execution.buffer-timeout: 100ms
  
  
+ #### 3.2 Flink 并发度大会导致CPU资源消耗高
  
- 
+ 生产环境很多任务的并发远大于 1000，所以造成很多 buffer 仅仅只缓存 1 条数据就被 timeout 策略触发发送给下游 Task。每条数据做为 1 个 buffer，每秒处理 1 万条数据，则后台线程每秒需要 flush 1 万个 buffer 到 NettyServer，从而大量消耗 CPU。
+
+不仅是发送方效率降低，下游的 Subtask B 接受数据的效率也会降低。每秒接受 1 万的 buffer，每个 buffer 里 1 条数据。大量的小 buffer，大量的读取小数据，消耗大量的 CPU 资源。
+
+ #### 3.3 Flink cpu调优
+
+测试条件：业务逻辑简单，keyBy 后不做任何业务处理，并发 1200。
+
+因为没有业务处理，所以从业务角度来讲，CPU 应该主要消耗在序列化和反序列化 protobuf。从引擎角度来讲，TM 之间数据 flush、传输需要消耗不少的 CPU。
+
+基于上述条件，仅调节 bufferTimeout 参数，观察单个 TM 的平均 CPU 消耗。
+
+bufferTimeout = 100ms 时，TM 平均 CPU 使用 0.59 core
+bufferTimeout = 1s 时，TM 平均 CPU 使用 0.39 core，CPU 节省了 33%
+bufferTimeout = 10s 时，TM 平均 CPU 使用 0.33 core，CPU 节省了 44%
  
  
 
