@@ -60,6 +60,22 @@ flink sql 与kafka partrition 相同的并发度
 
 激活catalog 持久化catalog
 
- 
+ ### 3 flink 调优
+ #### 3.1 Flink 如何权衡吞吐与延迟的关系
+ 正在写入的 buffer 肯定不能被 Netty 消费到，只有写完的 buffer 才能被消费到。在 Flink 中有三种情况会认为 buffer 写完了，可以被 Netty  Server 消费：
 
+buffer 写满了
+
+buffer 超时了
+
+遇到特殊的 Event，例如：Checkpoint barrier
+
+ 通过tm间 netty的buffer来设置：
+ Flink 1.10 及以后的版本直接通过配置参数 execution.buffer-timeout: 100ms
+ 
+ 
+ 
+ 
+ 
+ 
 
