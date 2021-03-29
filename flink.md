@@ -92,5 +92,15 @@ bufferTimeout = 100ms 时，TM 平均 CPU 使用 0.59 core
 bufferTimeout = 1s 时，TM 平均 CPU 使用 0.39 core，CPU 节省了 33%
 bufferTimeout = 10s 时，TM 平均 CPU 使用 0.33 core，CPU 节省了 44%
  
+ ### 4flink 问题汇总
  
+**资源不足导致 container 被 kill**
+`The assigned slot container_container编号 was removed.`
+Flink App 抛出此类异常，通过查看日志，一般就是某一个 Flink App 内存占用大，导致 TaskManager（在 Yarn 上就是 Container ）被Kill 掉。
 
+但是并不是所有的情况都是这个原因，还需要进一步看 yarn 的日志（ 查看 yarn 任务日志：yarn logs -applicationId  -appOwner），如果代码写的没问题，就确实是资源不够了，其实 1G Slot 跑多个Task（ Slot Group Share ）其实挺容易出现的。
+
+因此有两种选择，可以根据具体情况，权衡选择一个。
+
+将该 Flink App 调度在 Per Slot 内存更大的集群上。
+通过 slotSharingGroup("xxx") ，减少 Slot 中共享 Task 的个数
