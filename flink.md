@@ -92,9 +92,67 @@ bufferTimeout = 100ms 时，TM 平均 CPU 使用 0.59 core
 bufferTimeout = 1s 时，TM 平均 CPU 使用 0.39 core，CPU 节省了 33%
 bufferTimeout = 10s 时，TM 平均 CPU 使用 0.33 core，CPU 节省了 44%
  
+ #### 3.4 Flink 并行度优化
+ Flink 中算子链接（chain）起来的条件
+Flink 在内部会将多个算子串在一起作为一个 operator chain（执行链）来执行，每个执行链会在 TaskManager 上的一个独立线程中执行，这样不仅可以减少线程的数量及线程切换带来的资源消耗，还能降低数据在算子之间传输序列化与反序列化带来的消耗。
+
+举个例子，拿一个 Flink Job （算子的并行度都设置为 5）生成的 StreamGraph JSON 渲染出来的执行流程图如下图所示。
+
+![image](https://user-images.githubusercontent.com/42630862/112783835-d1816b00-9082-11eb-9980-fa1f619995dc.png)
+
+
+提交到 Flink UI 上的 JobGraph 如下图所示。
+
+
+
+![image](https://user-images.githubusercontent.com/42630862/112783829-ccbcb700-9082-11eb-8063-26d2518a81f0.png)
+
+
+可以看到 Flink 它内部将三个算子（source、filter、sink）都串成在一个执行链里。但是我们修改一下 filter 这个算子的并行度为 4，我们再次提交到 Flink UI 上运行，效果如下图所示。
+![image](https://user-images.githubusercontent.com/42630862/112783816-c3334f00-9082-11eb-87b6-62c06678edbd.png)
+你会发现它竟然拆分成三个了，我们继续将 sink 的并行度也修改成 4，继续打包运行后的效果如下图所示。
+![image](https://user-images.githubusercontent.com/42630862/112783811-c0385e80-9082-11eb-99a9-138d96628053.png)
+
+图片
+神奇不，它变成了 2 个了，将 filter 和 sink 算子串在一起了执行了。经过简单的测试，我们可以发现其实如果想要把两个不一样的算子串在一起执行确实还不是那么简单的，的确，它背后的条件可是比较复杂的，这里笔者给出源码出来，感兴趣的可以独自阅读下源码。
+
+public static boolean isChainable(StreamEdge edge, StreamGraph streamGraph) {
+    //获取StreamEdge的源和目标StreamNode
+ StreamNode upStreamVertex = edge.getSourceVertex();
+ StreamNode downStreamVertex = edge.getTargetVertex();
+ 
+    //获取源和目标StreamNode中的StreamOperator
+ StreamOperator<?> headOperator = upStreamVertex.getOperator();
+ StreamOperator<?> outOperator = downStreamVertex.getOperator();
+
+ return downStreamVertex.getInEdges().size() == 1
+   && outOperator != null
+   && headOperator != null
+   && upStreamVertex.isSameSlotSharingGroup(downStreamVertex)
+   && outOperator.getChainingStrategy() == ChainingStrategy.ALWAYS
+   && (headOperator.getChainingStrategy() == ChainingStrategy.HEAD ||
+    headOperator.getChainingStrategy() == ChainingStrategy.ALWAYS)
+   && (edge.getPartitioner() instanceof ForwardPartitioner)
+   && upStreamVertex.getParallelism() == downStreamVertex.getParallelism()
+   && streamGraph.isChainingEnabled();
+}
+从源码最后的 return 可以看出它有九个条件：
+
+下游节点只有一个输入
+下游节点的操作符不为 null
+上游节点的操作符不为 null
+上下游节点在一个槽位共享组（slotsharinggroup）内，默认是 default
+下游节点的连接策略是 ALWAYS（可以与上下游节点连接）
+上游节点的连接策略是 HEAD 或者 ALWAYS
+edge 的分区函数是 ForwardPartitioner 的实例（没有 keyby 等操作）
+上下游节点的并行度相等
+允许进行节点连接操作（默认允许）
+所以看到上面的这九个条件，你是不是在想如果我们代码能够合理的写好，那么就有可能会将不同的算子串在一个执行链中，这样也就可以提高代码的执行效率了。
+ 
  ### 4flink 问题汇总
  
 **资源不足导致 container 被 kill**
+
 `The assigned slot container_container编号 was removed.`
 Flink App 抛出此类异常，通过查看日志，一般就是某一个 Flink App 内存占用大，导致 TaskManager（在 Yarn 上就是 Container ）被Kill 掉。
 
@@ -104,3 +162,6 @@ Flink App 抛出此类异常，通过查看日志，一般就是某一个 Flink 
 
 将该 Flink App 调度在 Per Slot 内存更大的集群上。
 通过 slotSharingGroup("xxx") ，减少 Slot 中共享 Task 的个数
+
+
+
