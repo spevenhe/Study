@@ -1,0 +1,52 @@
+
+### yarn 的 资源本地化(Resource Localization)
+
+一个Applciation运行在YARN上的流程为，从YARN Client向ResourceManager提交任务，将Applciation所需资源提交到HDFS中，然后ResourceManager启动APPMaster，APPMaster通知各个NodeManager启动cont
+ainer执行具体到计算任务。
+**在启动container之前需要从HDFS上下载该container执行所依赖的资源，这些资源包括jar、依赖的jar或者其它文件，这个过程就称为资源本地化(Resource Localization)。**
+
+
+1. 本地化(Localization)
+
+本地化是指将HDFS上的资源下载到本地的过程。将资源本地化，使container不用总是访问HDFS上的数据，而是直接访问本地数据，提高效率。
+
+2. 本地资源(LocalResource)
+
+本地资源是指container运行时所需要的资源，可以是某个文件或者依赖的library，这些资源存在HDFS中。NodeManager在container启动之前负责将这些资源进行本地化。对于Application来说，本地资源指：
+
+URL: 需要从HDFS上下载的本地资源地址
+Size: 本地资源的大小
+timestamp: 本地资源在HDFS上创建时的时间戳
+LocalResourceType: NodeManager本地化资源时指定的资源类型，有FILE、ARCHIVE和PATTERN
+Pattern: 从archive中解压具体内容时使用的规则匹配方式(只有LocalResourceType是PATTERN时才生效)。
+LocalResourceVisibility: NodeManager将资源本地化之后针对该Nodemanager上其它用户和Application的可见性。可见范围为PUBLIC、PRIVATE和APPLICATION。
+NOTE: 本地资源并不是指在本地磁盘的资源，而是需要从HDFS下载到本地的资源。
+
+那么container会请求什么样的资源进行本地化呢？可以是任意的文件，但是这些文件对contianer必须是只读的。
+
+下面举几个比较适合做本地资源的典型例子：
+
+container启动的时候需要的代码库，如jar文件
+container启动时所需要的configure文件
+静态的文件目录
+一些动态资源不适合作为本地资源，例如：container需要的资源有可能被其它组件进行更新，application自己会直接更新的文件或者application想跟其它服务共享文件的变化情况的。
+
+3. LOCALRESOURCE TIMESTAMPS
+
+timestamp反应了本地资源的一个版本，NodeManager在下载本地资源时会检查timestamp，这样Application在运行时看到的文件内容都一样。
+
+利用timestamp，YARN能发现资源是否发生过变化，如果发生变化将使container失败避免不一致发生。因为在HDFS上的资源一旦被NodeManager本地化到本地磁盘，这个文件就不再与源文件有任何联系，只会记录下原来的URL用来在本地进行唯一标识。此时即使源文件发生变化，NodeManager也不会跟踪此变化再次下载文件。
+
+这里需要注意的是当container启动时，ApplicationMaster会向运行container的NodeManager指定资源的timestamp，同样当运行ApplicationMaster的container启动时，也需要资源的timestamp，此时这个timestamp就需要由client指定。以MapReduce on YARN为例，MapReduce的JobClient决定ApplicationMaster需要的资源的timestamp，然后由ApplicationMaster自己决定map和reduce所需资源的timestamp。
+
+本地化相关的配置
+在yarn-site.xml中有一些资源本地化相关的配置。
+
+yarn.nodemanager.local-dirs: 资源本地化时所在的本地目录，可以是以逗号分隔的多个磁盘目录。
+yarn.nodemanager.local-cache.max-files-per-directory: 每个目录中最多本地化文件的个数，PUBLIC / PRIVATE / APPLICATION分别统计。
+yarn.nodemanager.localizer.address: ResourceLocalizationService服务监听的RPC地址，用来接收不同localizers
+yarn.nodemanager.localizer.client.thread-count: ResourceLocalizationService中用来处理来自localizers请求的线程数。默认是5
+yarn.nodemanager.localizer.fetch.thread-count: 本地化PUBLIC资源时PublicLocalizer的线程数。默认是4
+yarn.nodemanager.delete.thread-count: DeletionService中删除文件的线程数，默认是4。
+yarn.nodemanager.localizer.cache.target-size-mb: 本地化资源所占的最大磁盘空间，单位是MB，比包括APPLICATION资源。
+yarn.nodemanager.localizer.cache.cleanup.interval-ms: 每隔固定时间，去检查下磁盘的使用量。在此间隔之后，如果存储的磁盘空间超过了配置的阈值，会删除未用的资源。
