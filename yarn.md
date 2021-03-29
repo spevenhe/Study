@@ -43,10 +43,17 @@ timestamp反应了本地资源的一个版本，NodeManager在下载本地资源
 在yarn-site.xml中有一些资源本地化相关的配置。
 
 yarn.nodemanager.local-dirs: 资源本地化时所在的本地目录，可以是以逗号分隔的多个磁盘目录。
+
 yarn.nodemanager.local-cache.max-files-per-directory: 每个目录中最多本地化文件的个数，PUBLIC / PRIVATE / APPLICATION分别统计。
+
 yarn.nodemanager.localizer.address: ResourceLocalizationService服务监听的RPC地址，用来接收不同localizers
+
 yarn.nodemanager.localizer.client.thread-count: ResourceLocalizationService中用来处理来自localizers请求的线程数。默认是5
+
 yarn.nodemanager.localizer.fetch.thread-count: 本地化PUBLIC资源时PublicLocalizer的线程数。默认是4
+
 yarn.nodemanager.delete.thread-count: DeletionService中删除文件的线程数，默认是4。
+
 yarn.nodemanager.localizer.cache.target-size-mb: 本地化资源所占的最大磁盘空间，单位是MB，比包括APPLICATION资源。
+
 yarn.nodemanager.localizer.cache.cleanup.interval-ms: 每隔固定时间，去检查下磁盘的使用量。在此间隔之后，如果存储的磁盘空间超过了配置的阈值，会删除未用的资源。
