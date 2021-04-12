@@ -92,6 +92,7 @@ group agg 优化
 
 
 
+
 #### 2.1 sql-client
 
 1. 使用UDF 继承类scalarFunction，打包，扔到lib，查看show functions
