@@ -31,6 +31,65 @@ group aggregation的输出的结果是不断更新的，相同的字段会更新
 
 4.1 需要用刀flink-json包，sql-client 内置
 
+### 3. flink sql 底层
+
+api 层次
+![image](https://user-images.githubusercontent.com/42630862/114370878-89019b80-9bb2-11eb-8994-7555c05c3e1e.png)
+
+catalog 架构
+![image](https://user-images.githubusercontent.com/42630862/114371567-32e12800-9bb3-11eb-8bfd-ac31349561a4.png)
+
+
+用户可以切换catalog，catalog在yaml中显式定义 1.9 ？
+
+
+![image](https://user-images.githubusercontent.com/42630862/114371734-60c66c80-9bb3-11eb-91e5-a5e9377fbba6.png)
+目前有两个地方可以使用ddl 1：table environment 2： sql client
+
+sql 向 job graph的转换：
+![image](https://user-images.githubusercontent.com/42630862/114372191-da5e5a80-9bb3-11eb-8171-48f0144fd0c5.png)
+
+1. sql 转换为 sqlNode
+
+2. 在functionCatalog 看一看有没有udf
+
+3. 转化为operation dag
+
+4. operation dag 转化为 relNode dag
+
+5. relnode dag涉及到优化器，在优化器里被优化
+
+6. 优化后转化为execNode dag
+
+7. 然后最后会被转化为jobgraph
+
+
+**分段优化的例子 **
+
+
+![image](https://user-images.githubusercontent.com/42630862/114373268-03cbb600-9bb5-11eb-9249-3b41b7cf4a92.png)
+
+
+![image](https://user-images.githubusercontent.com/42630862/114373422-21991b00-9bb5-11eb-9ac2-fe1465af8cee.png)
+
+**agg 的分类**
+ ![image](https://user-images.githubusercontent.com/42630862/114387969-ab50e480-9bc5-11eb-9d2f-9967850b282d.png)
+
+
+group agg 优化
+
+![image](https://user-images.githubusercontent.com/42630862/114388079-cfacc100-9bc5-11eb-9854-ec4173958902.png)
+
+** 重要**
+
+![image](https://user-images.githubusercontent.com/42630862/114388436-42b63780-9bc6-11eb-93aa-ec89cdd08eac.png)
+
+![image](https://user-images.githubusercontent.com/42630862/114388520-5d88ac00-9bc6-11eb-955e-9cb65063118a.png)
+
+![image](https://user-images.githubusercontent.com/42630862/114388843-d38d1300-9bc6-11eb-9e62-eaf730878843.png)
+
+![image](https://user-images.githubusercontent.com/42630862/114389028-12bb6400-9bc7-11eb-9320-85bb0eb8f849.png)
+
 
 
 #### 2.1 sql-client
@@ -59,6 +118,16 @@ sql 接Kafka，解析ddl，生成consumer
 flink sql 与kafka partrition 相同的并发度
 
 激活catalog 持久化catalog
+
+
+
+
+
+
+
+
+
+
 
  ### 3 flink 调优
  #### 3.1 Flink 如何权衡吞吐与延迟的关系
@@ -165,12 +234,16 @@ Flink App 抛出此类异常，通过查看日志，一般就是某一个 Flink 
 
 
 
-## FLINK ML
+# FLINK ML
 
 ![image](https://user-images.githubusercontent.com/42630862/114337007-d534e780-9b82-11eb-8743-4ecbaf3ea7ce.png)
+
+![image](https://user-images.githubusercontent.com/42630862/114352866-f4417280-9b9e-11eb-9a0a-5cf1f9e96f32.png)
+
+
 ### 目前思路
 
-
+##### 大的思路是在 离线模型的基础上，在用实时的数据对模型坐微调
 
 **1. 在历史数据，按照日期为单位，通过长时间范围判断当天的交易额，然后预测当天的交易额，情况是否正常，此为 按天 维度的**
 
@@ -178,8 +251,16 @@ Flink App 抛出此类异常，通过查看日志，一般就是某一个 Flink 
 
 **3. kafka数据直接进入模型做出预测**
 
-**4. kakfa同时还有一部分数据进入当日数据集，然后将当日数据集与当日时间作为数据进行训练，实时更新当日模型，具体为 通过当天的走势预测接下来的交易，思路有2 ： 1是将今日数据与往日数据结合起来，进行统计，但是提高今日数据的权重，二是将今日数据作为loss function，更新往日数据**
+**4. kakfa同时还有一部分数据进入当日数据集，然后将当日数据集与当日时间作为数据进行训练，实时更新当日模型，具体为 通过当天的走势预测接下来的交易，思路有2 ： 1是将今日数据与往日数据结合起来，进行训练，但是提高今日数据的权重，二是将今日数据作为loss function，只训练 往日数据**
 
+
+![image](https://user-images.githubusercontent.com/42630862/114365559-2b1e8500-9bad-11eb-95c7-3ff43099f88f.png)
+
+
+1. transformer 是对数据预处理，以及在线推理的抽象
+2. 是数据训练模型
+
+![image](https://user-images.githubusercontent.com/42630862/114366295-e6471e00-9bad-11eb-929d-27c36b3d6e18.png)
 
 
 
