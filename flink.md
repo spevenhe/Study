@@ -124,10 +124,45 @@ flink sql 与kafka partrition 相同的并发度
 
 
 
+#### 2.2 flink sql 数据打宽
+![image](https://user-images.githubusercontent.com/42630862/114491137-a2edbd80-9c48-11eb-88b4-34ed6a89d3d7.png)
+
+双流join 因为数据是无穷保存的，一定要指定ttl
 
 
+![image](https://user-images.githubusercontent.com/42630862/114491310-037cfa80-9c49-11eb-91c3-e0cc0c72d8b5.png)
 
+stae保留时间，只保留区间数据
 
+ #### 2.3.2 时态表 temporal table
+![image](https://user-images.githubusercontent.com/42630862/114491612-7a19f800-9c49-11eb-8e6a-8c95e5c09749.png)
+
+### 2.4 flink sql 语句例子
+
+tips
+
+1. similar
+
+SELECT 
+  log_time,
+  request_line,
+  status_code,
+  size
+FROM server_logs
+WHERE 
+  status_code SIMILAR TO '4[0-9][0-9]'
+  
+2. temporary table 临时表
+
+临时表不会储存在catalog中，只存在于 current session
+
+对于不会使用的表结构，在flink sql中建为临时表
+
+3. 对于时间乱序的数据 可以使用 order by + group by timewindow
+
+4. 使用view 非物理储存，来简化复杂脚本
+
+5. 向多个表写入数据
 
 
  ### 3 flink 调优
