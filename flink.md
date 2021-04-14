@@ -139,7 +139,7 @@ stae保留时间，只保留区间数据
 
 ### 2.4 flink sql 语句例子
 
-tips
+foundation tips
 
 1. similar
 
@@ -163,6 +163,11 @@ WHERE
 4. 使用view 非物理储存，来简化复杂脚本
 
 5. 向多个表写入数据
+
+6. 复杂sql 可使用sql regrep Oracle相关api
+
+聚合与分析
+1. group by tumble ,对每一个 key都输出统计值，可以与其他双重group
 
 
  ### 3 flink 调优
