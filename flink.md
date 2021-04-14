@@ -167,7 +167,29 @@ WHERE
 6. 复杂sql 可使用sql regrep Oracle相关api
 
 聚合与分析
-1. group by tumble ,对每一个 key都输出统计值，可以与其他双重group
+1. group by tumble ,对每一个 key都输出统计值，可以与其他双重group，tumble 固定窗口滑动
+
+适用于key少的情况
+
+2. 加入watermark 处理乱序
+
+3. session window 按间隔统计数据
+
+4. OVER
+OVER window aggregates compute an aggregated value for every input row over a range of ordered rows. In contrast to GROUP BY aggregates, OVER aggregates do not reduce the number of result rows to a single row for every group. Instead, OVER aggregates produce an aggregated value for every input row.
+
+over 的意思是来一条就输出一次，并不是每个时间范围输出一次，适用于key很多的情况
+
+5. top N  有特定语法结构，须保持一致，不然blink解析不了
+
+6. 去重 特殊的topN top1
+
+7. 链式事件时间窗口：比如求1小时平均与 1min平均，可以创建两个view，其中1min得view根据1h得view  创建，然后将1min得window插入1h得window 中去，通过另一个表、view创建view，可以形成链式
+
+
+
+
+
 
 
  ### 3 flink 调优
