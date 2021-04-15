@@ -186,8 +186,36 @@ over 的意思是来一条就输出一次，并不是每个时间范围输出一
 
 7. 链式事件时间窗口：比如求1小时平均与 1min平均，可以创建两个view，其中1min得view根据1h得view  创建，然后将1min得window插入1h得window 中去，通过另一个表、view创建view，可以形成链式
 
+flink sql 内置函数
+
+1.   
+CREATE TABLE subscriptions ( 
+    id STRING,
+    start_date INT,
+    end_date INT,
+    payment_expiration TIMESTAMP(3)
+) WITH (
+  'connector' = 'faker',
+  'fields.id.expression' = '#{Internet.uuid}', 
+  'fields.start_date.expression' = '#{number.numberBetween ''1576141834'',''1607764234''}',
+  'fields.end_date.expression' = '#{number.numberBetween ''1609060234'',''1639300234''}',
+  'fields.payment_expiration.expression' = '#{date.future ''365'',''DAYS''}'
+);
+
+SELECT 
+  id,
+  TO_TIMESTAMP(FROM_UNIXTIME(start_date)) AS start_date,
+  TO_TIMESTAMP(FROM_UNIXTIME(end_date)) AS end_date,
+  DATE_FORMAT(payment_expiration,'YYYYww') AS exp_yweek,
+  EXTRACT(DAY FROM payment_expiration) AS exp_day,     --same as DAYOFMONTH(ts)
+  EXTRACT(MONTH FROM payment_expiration) AS exp_month, --same as MONTH(ts)
+  EXTRACT(YEAR FROM payment_expiration) AS exp_year    --same as YEAR(ts)
+FROM subscriptions
+WHERE 
+  TIMESTAMPDIFF(DAY,CURRENT_TIMESTAMP,payment_expiration) < 30;
 
 
+2.  
 
 
 
