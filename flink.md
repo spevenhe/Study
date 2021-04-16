@@ -188,7 +188,7 @@ over 的意思是来一条就输出一次，并不是每个时间范围输出一
 
 flink sql 内置函数
 
-1.   
+1.   time
 CREATE TABLE subscriptions ( 
     id STRING,
     start_date INT,
@@ -215,8 +215,12 @@ WHERE
   TIMESTAMPDIFF(DAY,CURRENT_TIMESTAMP,payment_expiration) < 30;
 
 
-2.  
+2.  union all
 
+
+### 2.5 flink watermark 配置
+
+1. rowtime 代表事件时间
 
 
 
