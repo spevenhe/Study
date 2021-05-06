@@ -313,6 +313,122 @@ edge 的分区函数是 ForwardPartitioner 的实例（没有 keyby 等操作）
 允许进行节点连接操作（默认允许）
 所以看到上面的这九个条件，你是不是在想如果我们代码能够合理的写好，那么就有可能会将不同的算子串在一个执行链中，这样也就可以提高代码的执行效率了。
  
+ 
+ #### 3.5 Flink 内存调优
+ ###### 配置内存
+ 
+操作场景
+
+Flink是依赖内存计算，计算过程中内存不够对Flink的执行效率影响很大。可以通过监控GC（Garbage Collection），评估内存使用及剩余情况来判断内存是否变成性能瓶颈，并根据情况优化。
+监控节点进程的YARN的Container GC日志，如果频繁出现Full GC，需要优化GC。
+GC的配置：在客户端的"conf/flink-conf.yaml"配置文件中，在“env.java.opts”配置项中添加参数：
+
+-Xloggc:<LOG_DIR>/gc.log 
+
+-XX:+PrintGCDetails 
+
+-XX:-OmitStackTraceInFastThrow 
+
+-XX:+PrintGCTimeStamps 
+
+-XX:+PrintGCDateStamps 
+
+-XX:+UseGCLogFileRotation 
+
+-XX:NumberOfGCLogFiles=20 
+
+-XX:GCLogFileSize=20M
+
+此处默认已经添加GC日志。
+
+操作步骤
+优化GC
+
+调整老年代和新生代的比值。在客户端的“conf/flink-conf.yaml”配置文件中，在“env.java.opts”配置项中添加参数：“-XX:NewRatio”。如“ -XX:NewRatio=2”，则表示老年代与新生代的比值为2:1，新生代占整个堆空间的1/3，老年代占2/3。
+开发Flink应用程序时，优化DataStream的数据分区或分组操作。
+
+当分区导致数据倾斜时，需要考虑优化分区。避免非并行度操作，有些对DataStream的操作会导致无法并行，例如WindowAll。keyBy尽量不要使用String。
+
+
+
+##### 3.配置进程参数
+操作场景
+
+Flink on YARN模式下，有JobManager和TaskManager两种进程。在任务调度和运行的过程中，JobManager和TaskManager承担了很大的责任。
+
+因而JobManager和TaskManager的参数配置对Flink应用的执行有着很大的影响意义。用户可通过如下操作对Flink集群性能做优化。
+
+操作步骤
+
+1.配置JobManager内存
+
+JobManager负责任务的调度，以及TaskManager、RM之间的消息通信。当任务数变多，任务平行度增大时，JobManager内存都需要相应增大。您可以根据实际任务数量的多少，为JobManager设置一个合适的内存。
+在使用yarn-session命令时，添加“-jm MEM”参数设置内存。
+
+在使用yarn-cluster命令时，添加“-yjm MEM”参数设置内存。
+
+2.配置TaskManager个数
+
+每个TaskManager每个核同时能跑一个task，所以增加了TaskManager的个数相当于增大了任务的并发度。在资源充足的情况下，可以相应增加TaskManager的个数，以提高运行效率。
+在使用yarn-session命令时，添加“-n NUM”参数设置TaskManager个数。
+
+在使用yarn-cluster命令时，添加“-yn NUM”参数设置TaskManager个数。
+
+3.配置TaskManager Slot数
+
+
+每个TaskManager多个核同时能跑多个task，相当于增大了任务的并发度。但是由于所有核共用TaskManager的内存，所以要在内存和核数之间做好平衡。
+在使用yarn-session命令时，添加“-s NUM”参数设置SLOT数。
+
+在使用yarn-cluster命令时，添加“-ys NUM”参数设置SLOT数。
+
+4.配置TaskManager内存
+
+
+TaskManager的内存主要用于任务执行、通信等。当一个任务很大的时候，可能需要较多资源，因而内存也可以做相应的增加。
+将在使用yarn-sesion命令时，添加“-tm MEM”参数设置内存。
+
+将在使用yarn-cluster命令时，添加“-ytm MEM”参数设置内存。
+
+##### 配置netty网络通信
+操作场景
+
+Flink通信主要依赖netty网络，所以在Flink应用执行过程中，netty的设置尤为重要，网络通信的好坏直接决定着数据交换的速度以及任务执行的效率。
+操作步骤
+
+以下配置均可在客户端的“conf/flink-conf.yaml”配置文件中进行修改适配，默认已经是相对较优解，请谨慎修改，防止性能下降。
+
+•“taskmanager.network.netty.num-arenas”：默认是“taskmanager.numberOfTaskSlots”，表示netty的域的数量。
+
+•“taskmanager.network.netty.server.numThreads”和“taskmanager.network.netty.client.numThreads”：默认是“taskmanager.numberOfTaskSlots”，表示netty的客户端和服务端的线程数目设置。 
+
+•“taskmanager.network.netty.client.connectTimeoutSec”：默认是120s，表示taskmanager的客户端连接超时的时间。
+
+“taskmanager.network.netty.sendReceiveBufferSize”：默认是系统缓冲区大小(cat /proc/sys/net/ipv4/tcp _ [rw]mem) ，一般为4MB，表示netty的发送和接收的缓冲区大小。
+
+“taskmanager.network.netty.transport”：默认为“nio”方式，表示netty的传输方式，有“nio”和“epoll”两种方式。
+ 
+ 
+ ##### 解决数据倾斜
+ 
+当数据发生倾斜（某一部分数据量特别大），虽然没有GC（Gabage Collection，垃圾回收），但是task执行时间严重不一致。
+
+需要重新设计key，以更小粒度的key使得task大小合理化。
+
+修改并行度。
+
+调用rebalance操作，使数据分区均匀。
+
+缓冲区超时设置
+
+由于task在执行过程中存在数据通过网络进行交换，数据在不同服务器之间传递的缓冲区超时时间可以通过setBufferTimeout进行设置。
+
+当设置“setBufferTimeout(-1)”，会等待缓冲区满之后才会刷新，使其达到最大吞吐量；当设置“setBufferTimeout(0)”时，可以最小化延迟，数据一旦接收到就会刷新；当设置“setBufferTimeout”大于0时，缓冲区会在该时间之后超时，然后进行缓冲区的刷新。示例可以参考如下：env.setBufferTimeout(timeoutMillis); env.generateSequence(1,10).map(new MyMapper()).setBufferTimeout(timeoutMillis);
+ 
+
+
+
+
  ### 4flink 问题汇总
  
 **资源不足导致 container 被 kill**
@@ -369,4 +485,10 @@ Flink App 抛出此类异常，通过查看日志，一般就是某一个 Flink 
 
 通过老商户正常流水，识别异常交易行为
 普通预测
+
+
+
+
+
+
 
