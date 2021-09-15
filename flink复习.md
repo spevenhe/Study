@@ -21,6 +21,34 @@
 ![image](https://user-images.githubusercontent.com/42630862/127351279-022bd509-636d-4b7e-a7b8-4bdb6252cb2b.png)
 
 
+## 窗口聚合函数
+窗口函数（window function
+
+•
+window function 定义 了要对窗口中收集的数据做的计算 操作
+
+•
+可以分为两类
+
+1
+增量聚合函数（ i ncremental aggregation functions
+
+•
+每条数据到来就进行计算，保持一个简单的状态
+
+•
+ReduceFunction, AggregateFunction
+
+其中reducefunction 与 aggregatefunction 最大的区别在于输出类型的不同
+
+2
+全窗口函数（ f ull window functions
+
+•
+先把窗口所有数据收集起来，等到计算的时候 会 遍历所有数据
+
+•
+ProcessWindowFunction WindowFunction
 
 
 
