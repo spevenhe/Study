@@ -51,5 +51,28 @@ ReduceFunction, AggregateFunction
 ProcessWindowFunction WindowFunction
 
 
+## watermark
+那么此时出现一个问题，一旦出现乱序，如果只根据
+eventTime 决定 window 的
+运行，我们不能明确数据是否全部到位，但又不能无限期的等下去，此时必须要有
+个机制来保证一个特定的时间后，必须触发 window 去 进行计算了，这个特别的机
+制，就是 Watermark 。
 
+⚫ Watermark 是一种衡量 Event Time 进展的机制 。
+
+⚫ Watermark 是用于处理乱序事件的 ，而正确的处理乱序事件，通常用
+Watermark 机制结合 window 来实现。
+
+⚫ 数据流中的 Watermark 用于表示 timestamp 小于 Watermark 的数据，都已经
+到达了，因此， window 的执行也是由 Watermark 触发的。
+
+⚫ Watermark 可以理解成一个延迟触发机制，我们可以设置 Watermark 的延时
+时长 t ，每次系统会校验已经到达的数据中最大 的 max E vent T ime ，然后认定 eventTime
+小于 max E vent T ime t 的所有数据都已经到达，如果有窗口的停止时间等于
+max E vent T ime t ，那么这个窗口被触发执行。
+
+**Watermark**
+就是触发前一窗口的“关窗时间”，一旦触发关门那么以当前时刻
+为准在窗口范围内的所有所有数据都会收入窗中。
+只要没有达到水位那么不管现实中的时间推进了多久都不会触发关窗。
 
