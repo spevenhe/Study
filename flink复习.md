@@ -76,3 +76,13 @@ max E vent T ime t ，那么这个窗口被触发执行。
 为准在窗口范围内的所有所有数据都会收入窗中。
 只要没有达到水位那么不管现实中的时间推进了多久都不会触发关窗。
 
+
+
+                .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<SensorReading>(Time.seconds(2)) {
+                    // 必须传毫秒
+                    @Override
+                    public long extractTimestamp(SensorReading element) {
+                        return element.getTimestamp() * 1000L;
+                    }
+                });
+
