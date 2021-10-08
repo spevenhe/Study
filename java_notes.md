@@ -159,6 +159,7 @@ synchronized 通过监视器(Monitor)实现锁。java 一切皆对象，每个�
 
 通过命令看下 synchronized 关键字到底做了什么事情：首先用 cd 命令切换到 SynchronizedTest.java 类所在的路径，然后执行 javac SynchronizedTest.java，于是就会产生一个名为 SynchronizedTest.class 的字节码文件，然后我们执行 javap -c SynchronizedTest.class，就可以看到对应的反汇编内容，如下：
 
+```
 Z:\IDEAProject\review\review_java\src\main\java\com\nasus\thread\lock>javac -encoding UTF-8 SynchronizedTest.java
 
 Z:\IDEAProject\review\review_java\src\main\java\com\nasus\thread\lock>javap -c SynchronizedTest.class
@@ -195,6 +196,7 @@ public class com.nasus.thread.lock.SynchronizedTest {
            4     6     9   any
            9    12     9   any
 }
+```
 类锁 同步代码块解析
 主要看 类锁 同步代码块的反编译内容，可以看出 synchronized 多了 monitorenter 和 monitorexit 指令。把执行 monitorenter 理解为加锁，执行 monitorexit 理解为释放锁，每个对象维护着一个记录着被锁次数的计数器。未被锁定的对象的该计数器为 0。
 
