@@ -138,9 +138,81 @@ public class CheesyCounter {
 
 使用锁进行所有变化的操作，使用 volatile 进行只读操作。
 其中，锁一次只允许一个线程访问值，volatile 允许多个线程执行读操作
-————————————————
-版权声明：本文为CSDN博主「AlphaWang」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
-原文链接：https://blog.csdn.net/vking_wang/article/details/9982709
+
+
+## synchronized
+
+synchronized 是 Java 的一个关键字，它能够将代码块 (方法) 锁起来。
+
+synchronized 是 互斥锁，同一时间只能有一个线程进入被锁住的代码块(方法)。
+
+synchronized 通过监视器(Monitor)实现锁。java 一切皆对象，每个对象都有一个监视器(锁标记)，而 synchronized 就是使用对象的监视器来将代码块 (方法) 锁定的！
+
+### 怎么用 Synchronized ？
+修饰普通同步方法：对象锁：一个对象一把锁，多个对象多把锁。
+
+修饰静态同步方法：类锁：所有对象共用一个锁
+
+修饰同步代码块：也分类锁、对象锁
+
+其中 synchronized(this)为对象锁，synchronized(A.Class)为类锁
+
+通过命令看下 synchronized 关键字到底做了什么事情：首先用 cd 命令切换到 SynchronizedTest.java 类所在的路径，然后执行 javac SynchronizedTest.java，于是就会产生一个名为 SynchronizedTest.class 的字节码文件，然后我们执行 javap -c SynchronizedTest.class，就可以看到对应的反汇编内容，如下：
+
+Z:\IDEAProject\review\review_java\src\main\java\com\nasus\thread\lock>javac -encoding UTF-8 SynchronizedTest.java
+
+Z:\IDEAProject\review\review_java\src\main\java\com\nasus\thread\lock>javap -c SynchronizedTest.class
+Compiled from "SynchronizedTest.java"
+public class com.nasus.thread.lock.SynchronizedTest {
+  public com.nasus.thread.lock.SynchronizedTest();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."":()V
+       4: return
+  public static synchronized void test();
+    Code:
+       0: return
+  public synchronized void test1();
+    Code:
+       0: return
+  public void test2();
+    Code:
+       0: aload_0
+       1: dup
+       2: astore_1
+       3: monitorenter  // 监视器进入，获取锁
+       4: aload_1
+       5: monitorexit  // 监视器退出，释放锁
+       6: goto          14
+       9: astore_2
+      10: aload_1
+      11: monitorexit  // 监视器退出，释放锁
+      12: aload_2
+      13: athrow
+      14: return
+    Exception table:
+       from    to  target type
+           4     6     9   any
+           9    12     9   any
+}
+类锁 同步代码块解析
+主要看 类锁 同步代码块的反编译内容，可以看出 synchronized 多了 monitorenter 和 monitorexit 指令。把执行 monitorenter 理解为加锁，执行 monitorexit 理解为释放锁，每个对象维护着一个记录着被锁次数的计数器。未被锁定的对象的该计数器为 0。
+
+那这里为啥只有一次 monitorenter 却有两次 monitorexit ？
+
+JVM 要保证每个 monitorenter 必须有与之对应的 monitorexit，monitorenter 指令被插入到同步代码块的开始位置，而 monitorexit 需要插入到方法正常结束处和异常处两个地方，这样就可以保证抛异常的情况下也能释放锁。
+执行 monitorenter 的线程尝试获得 monitor 的所有权，会发生以下这三种情况之一：
+
+a. 如果该 monitor 的计数为 0，则线程获得该 monitor 并将其计数设置为 1。然后，该线程就是这个 monitor 的所有者。b. 如果线程已经拥有了这个 monitor ，则它将重新进入，并且累加计数。c. 如果其他线程已经拥有了这个 monitor，那个这个线程就会被阻塞，直到这个 monitor 的计数变成为 0，代表这个 monitor 已经被释放了，于是当前这个线程就会再次尝试获取这个 monitor。
+
+monitorexit
+
+monitorexit 的作用是将 monitor 的计数器减 1，直到减为 0 为止。代表这个 monitor 已经被释放了，已经没有任何线程拥有它了，也就代表着解锁，所以，其他正在等待这个 monitor 的线程，此时便可以再次尝试获取这个 monitor 的所有权。
+
+对象锁 普通同步方法
+它并不是依靠 monitorenter 和 monitorexit 指令实现的，从上面的反编译内容可以看到，synchronized 方法和普通方法大部分是一样的，不同在于，这个方法会有一个叫作 ACC_SYNCHRONIZED 的 flag 修饰符，来表明它是同步方法。(在这看不出来需要看 JVM 底层实现)
+
+当某个线程要访问某个方法的时候，会首先检查方法是否有 ACC_SYNCHRONIZED 标志，如果有则需要先获得 monitor 锁，然后才能开始执行方法，方法执行之后再释放 monitor 锁。
 
 
 
