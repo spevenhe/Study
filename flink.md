@@ -489,13 +489,6 @@ Flink App 抛出此类异常，通过查看日志，一般就是某一个 Flink 
 
 
 
-### flink 内存模型
-1.10 以上版本
-![image](https://user-images.githubusercontent.com/42630862/136755831-3be5f981-2c29-4f56-95a1-d507cad40b57.png)
-
-
-Flink JVM 进程的*进程总内存（Total Process Memory）*包含了由 Flink 应用使用的内存（Flink 总内存）以及由运行 Flink 的 JVM 使用的内存。 Flink 总内存（Total Flink Memory）包括 JVM 堆内存（Heap Memory）和堆外内存（Off-Heap Memory）。 其中堆外内存包括直接内存（Direct Memory）和本地内存（Native Memory）。
-
 
 
 
