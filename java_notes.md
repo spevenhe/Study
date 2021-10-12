@@ -216,5 +216,75 @@ monitorexit 的作用是将 monitor 的计数器减 1，直到减为 0 为止。
 
 当某个线程要访问某个方法的时候，会首先检查方法是否有 ACC_SYNCHRONIZED 标志，如果有则需要先获得 monitor 锁，然后才能开始执行方法，方法执行之后再释放 monitor 锁。
 
+# java类加载 与jar 包加载
 
+### 类加载器的隔离问题
+每个类装载器都有一个自己的命名空间用来保存已装载的类。当一个类装载器装载一个类时，它会通过保存在命名空间里的类全局限定名(Fully Qualified Class Name) 进行搜索来检测这个类是否已经被加载了。
+
+JVM 对类唯一的识别是 ClassLoader id + PackageName + ClassName，所以一个运行程序中是有可能存在两个包名和类名完全一致的类的。并且如果这两个类不是由一个 ClassLoader 加载，是无法将一个类的实例强转为另外一个类的，这就是 ClassLoader 隔离性。
+
+为了解决类加载器的隔离问题，JVM引入了双亲委派机制。
+
+### 双亲委派机制
+双亲委派机制的核心有两点：第一，自底向上检查类是否已加载；其二，自顶向下尝试加载类。
+![image](https://user-images.githubusercontent.com/42630862/136877679-ec969892-6b00-49ab-b8bd-898149ffa535.png)
+类加载器通常有四类：启动类加载器、拓展类加载器、应用程序类加载器和自定义类加载器。
+
+暂且不考虑自定义类加载器，JDK自带类加载器具体执行过程如下：
+
+第一：当AppClassLoader加载一个class时，会把类加载请求委派给父类加载器ExtClassLoader去完成；
+
+第二：当ExtClassLoader加载一个class时，会把类加载请求委派给BootStrapClassLoader去完成；
+
+第三：如果BootStrapClassLoader加载失败（例如在%JAVA_HOME%/jre/lib里未查找到该class），会使用ExtClassLoader来尝试加载；
+
+第四：如果ExtClassLoader也加载失败，则会使用AppClassLoader来加载，如果AppClassLoader也加载失败，则会报出异常ClassNotFoundException。
+
+### ClassLoader的双亲委派实现
+ClassLoader通过loadClass()方法实现了双亲委托机制，用于类的动态加载。
+
+该方法的源码如下：
+```
+protected Class<?> loadClass(String name, boolean resolve)
+        throws ClassNotFoundException{
+        synchronized (getClassLoadingLock(name)) {
+            // First, check if the class has already been loaded
+            Class<?> c = findLoadedClass(name);
+            if (c == null) {
+                long t0 = System.nanoTime();
+                try {
+                    if (parent != null) {
+                        c = parent.loadClass(name, false);
+                    } else {
+                        c = findBootstrapClassOrNull(name);
+                    }
+                } catch (ClassNotFoundException e) {
+                    // ClassNotFoundException thrown if class not found
+                    // from the non-null parent class loader
+                }
+
+                if (c == null) {
+                    // If still not found, then invoke findClass in order
+                    // to find the class.
+                    long t1 = System.nanoTime();
+                    c = findClass(name);
+
+                    // this is the defining class loader; record the stats
+                    sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+                    sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                    sun.misc.PerfCounter.getFindClasses().increment();
+                }
+            }
+            if (resolve) {
+                resolveClass(c);
+            }
+            return c;
+        }
+    }
+```
+loadClass方法本身是一个递归向上调用的过程，上述代码中从parent.loadClass的调用就可以看出。
+
+在执行其他操作之前，首先通过findLoadedClass方法从最底端的类加载器开始检查是否已经加载指定的类。如果已经加载，则根据resolve参数决定是否要执行连接过程，并返回Class对象。
+
+而Jar包冲突往往发生在这里，当第一个同名的类被加载之后，在这一步检查时就会直接返回，不会再加载真正需要的类。那么，程序用到该类时就会抛出找不到类，或找不到类方法的异常。
 
