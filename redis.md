@@ -41,8 +41,16 @@ Redis提供了Bitmaps这个“数据类型”可以实现对位的操作：
 ![image](https://user-images.githubusercontent.com/42630862/146502673-a8e04c9c-a6d4-41be-94f6-fbb1d62d2718.png)
 
 
+### 命令
+1、setbit
+（1）格式
+setbit<key><offset><value>设置Bitmaps中某个偏移量的值（0或1）
 
+2、getbit
+（1）格式
+getbit<key><offset>获取Bitmaps中某个偏移量的值
 
+ 
 
 ## 8 geospatial
 
