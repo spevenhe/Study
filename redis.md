@@ -32,6 +32,16 @@ zset底层使用了两个数据结构
 
 ## 7 bitmaps
 
+Redis提供了Bitmaps这个“数据类型”可以实现对位的操作：
+
+（1）	Bitmaps本身不是一种数据类型， 实际上它就是字符串（key-value） ， 但是它可以对字符串的位进行操作。
+
+（2）	Bitmaps单独提供了一套命令， 所以在Redis中使用Bitmaps和使用字符串的方法不太相同。 可以把Bitmaps想象成一个以位为单位的数组， 数组的每个单元只能存储0和1， 数组的下标在Bitmaps中叫做偏移量。
+
+![image](https://user-images.githubusercontent.com/42630862/146502673-a8e04c9c-a6d4-41be-94f6-fbb1d62d2718.png)
+
+
+
 
 
 ## 8 geospatial
