@@ -27,7 +27,10 @@ zset底层使用了两个数据结构
 
 
 ## 6 hyperlog
+HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。
+在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同元素的基数。这和计算基数时，元素越多耗费内存就越多的集合形成鲜明对比。
 
+**具体参考 hyperlog**
 
 
 ## 7 bitmaps
@@ -50,10 +53,33 @@ setbit<key><offset><value>设置Bitmaps中某个偏移量的值（0或1）
 （1）格式
 getbit<key><offset>获取Bitmaps中某个偏移量的值
 
- 
+ 3、bitcount
+统计字符串被设置为1的bit数。一般情况下，给定的整个字符串都会被进行计数，通过指定额外的 start 或 end 参数，可以让计数只在特定的位上进行。start 和 end 参数的设置，都可以使用负数值：比如 -1 表示最后一个位，而 -2 表示倒数第二个位，start、end 是指bit组的字节的下标数，二者皆包含。
+（1）格式
+bitcount<key>[start end] 统计字符串从start字节到end字节比特值为1的数量
+
 
 ## 8 geospatial
+Redis 3.2 中增加了对GEO类型的支持。GEO，Geographic，地理信息的缩写。该类型，就是元素的2维坐标，在地图上就是经纬度。redis基于该类型，提供了经纬度设置，查询，范围查询，距离查询，经纬度Hash等常见操作。
+ 
+ 1、geoadd
 
+（1）格式
+geoadd<key>< longitude><latitude><member> [longitude latitude member...]   添加地理位置（经度，纬度，名称）
+
+2 geopos  <key><member> [member...]  获得指定地区的坐标值
+ 
+ 3、geodist
+
+（1）格式
+geodist<key><member1><member2>  [m|km|ft|mi ]  获取两个位置之间的直线距离
+
+ 4、georadius
+（1）格式
+georadius<key>< longitude><latitude>radius  m|km|ft|mi   以给定的经纬度为中心，找出某一半径内的元素
+
+ 
+ 
 # redis 内存
 
 4.6.2.	maxmemory 
