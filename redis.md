@@ -1,9 +1,31 @@
 # redis 数据结构
+https://mp.weixin.qq.com/s/MGcOl1kGuKdA7om0Ahz5IA
 
 ![image](https://user-images.githubusercontent.com/42630862/146705535-3c742c9a-149d-499a-b267-6ebd2c60a7c0.png)
 
 
 ## 1 string
+set   <key><value>添加键值对
+ 
+*NX：当数据库中key不存在时，可以将key-value添加数据库
+*XX：当数据库中key存在时，可以将key-value添加数据库，与NX参数互斥
+*EX：key的超时秒数
+*PX：key的超时毫秒数，与EX互斥
+
+get   <key>查询对应键值
+append  <key><value>将给定的<value> 追加到原值的末尾
+strlen  <key>获得值的长度
+setnx  <key><value>只有在 key 不存在时    设置 key 的值
+
+incr  <key>
+将 key 中储存的数字值增1
+只能对数字值操作，如果为空，新增值为1
+decr  <key>
+将 key 中储存的数字值减1
+只能对数字值操作，如果为空，新增值为-1
+incrby / decrby  <key><步长>将 key 中储存的数字值增减。自定义步长。
+
+### 数据结构
 ### sds
 ![image](https://user-images.githubusercontent.com/42630862/146707090-b3f6b6d2-546e-41cb-b73b-4d5c9ae3c4fd.png)
 
@@ -51,6 +73,24 @@ Redos 一共设计了 5 种类型，分别是 sdshdr5、sdshdr8、sdshdr16、sds
 
 ## 2 List
 
+lpush/rpush  <key><value1><value2><value3> .... 从左边/右边插入一个或多个值。
+lpop/rpop  <key>从左边/右边吐出一个值。值在键在，值光键亡。
+
+rpoplpush  <key1><key2>从<key1>列表右边吐出一个值，插到<key2>列表左边。
+
+lrange <key><start><stop>
+按照索引下标获得元素(从左到右)
+lrange mylist 0 -1   0左边第一个，-1右边第一个，（0-1表示获取所有）
+lindex <key><index>按照索引下标获得元素(从左到右)
+llen <key>获得列表长度 
+
+linsert <key>  before <value><newvalue>在<value>的后面插入<newvalue>插入值
+lrem <key><n><value>从左边删除n个value(从左到右)
+lset<key><index><value>将列表key下标为index的值替换成value
+
+### data structure
+
+**3.0之前**
 数据量小 压缩列表
 数据量大 双向快速链表
 
@@ -130,16 +170,90 @@ prevlen，记录了前一个节点的长度；
 encoding，记录了当前节点实际数据的类型以及长度；
 
 data，记录了当前节点的实际数据；
-
+  
+**3.2之后**
+  
+  ## quicklist
 
 ## 3 Set
 
+sadd <key><value1><value2> ..... 
+将一个或多个 member 元素加入到集合 key 中，已经存在的 member 元素将被忽略
+
+   smembers <key>取出该集合的所有值。
+
+    sismember <key><value>判断集合<key>是否为含有该<value>值，有1，没有0
+
+    scard<key>返回该集合的元素个数。
+
+    srem <key><value1><value2> .... 删除集合中的某个元素。
+    
+spop <key>随机从该集合中吐出一个值。
+    
+srandmember <key><n>随机从该集合中取出n个值。不会从集合中删除 。
+    
+smove <source><destination>value把集合中一个值从一个集合移动到另一个集合
+    
+sinter <key1><key2>返回两个集合的交集元素。
+    
+sunion <key1><key2>返回两个集合的并集元素。
+    
+sdiff <key1><key2>返回两个集合的差集元素(key1中的，不包含key2中的)
+
+### data structure
 ### 哈希表，所有value指向同一个内部值
 Set数据结构是dict字典，字典是用哈希表实现的。
 Java中HashSet的内部实现使用的是HashMap，只不过所有的value都指向同一个对象。Redis的set结构也是一样，它的内部也使用hash结构，所有的value都指向同一个内部值。
 
+## 整数集合
+
+```
+typedef struct intset {
+    //编码方式
+    uint32_t encoding;
+    //集合包含的元素数量
+    uint32_t length;
+    //保存元素的数组
+    int8_t contents[];
+} intset;
+```
+可以看到，保存元素的容器是一个 contents 数组，虽然 contents 被声明为 int8_t 类型的数组，但是实际上 contents 数组并不保存任何 int8_t 类型的元素，contents 数组的真正类型取决于 intset 结构体里的 encoding 属性的值。比如：
+
+如果 encoding 属性值为 INTSET_ENC_INT16，那么 contents 就是一个 int16_t 类型的数组，数组中每一个元素的类型都是 int16_t；
+
+如果 encoding 属性值为 INTSET_ENC_INT32，那么 contents 就是一个 int32_t 类型的数组，数组中每一个元素的类型都是 int32_t；
+
+如果 encoding 属性值为 INTSET_ENC_INT64，那么 contents 就是一个 int64_t 类型的数组，数组中每一个元素的类型都是 int64_t；
+
+不同类型的 contents 数组，意味着数组的大小也会不同。
+
+### 整数集合的升级操作
+整数集合会有一个升级规则，就是当我们将一个新元素加入到整数集合里面，如果新元素的类型（int32_t）比整数集合现有所有元素的类型（int16_t）都要长时，整数集合需要先进行升级，也就是按新元素的类型（int32_t）扩展 contents 数组的空间大小，然后才能将新元素加入到整数集合里，当然升级的过程中，也要维持整数集合的有序性。
+
+整数集合升级的过程不会重新分配一个新类型的数组，而是在原本的数组上扩展空间，然后在将每个元素按间隔类型大小分割，如果 encoding 属性值为 INTSET_ENC_INT16，则每个元素的间隔就是 16 位。
+
+
 ## 4 Hash
 
+
+hset <key><field><value>给<key>集合中的  <field>键赋值<value>
+
+    hget <key1><field>从<key1>集合<field>取出 value 
+
+    hmset <key1><field1><value1><field2><value2>... 批量设置hash的值
+
+    hexists<key1><field>查看哈希表 key 中，给定域 field 是否存在。 
+
+    hkeys <key>列出该hash集合的所有field
+
+    hvals <key>列出该hash集合的所有value
+
+    hincrby <key><field><increment>为哈希表 key 中的域 field 的值加上增量 1   -1
+
+    hsetnx <key><field><value>将哈希表 key 中的域 field 的值设置为 value ，当且仅当域 field 不存在 .
+
+    ### data structure
+## data strcuture
 Hash类型对应的数据结构是两种：ziplist（压缩列表），hashtable（哈希表）。当field-value长度较短且个数较少时，使用ziplist，否则使用hashtable。
 
 ![image](https://user-images.githubusercontent.com/42630862/146759394-094a6cd2-1039-4134-9d5a-e2a65302300a.png)
@@ -169,10 +283,79 @@ Hash类型对应的数据结构是两种：ziplist（压缩列表），hashtable
 另外，在渐进式 rehash 进行期间，新增一个 key-value 时，会被保存到「哈希表 2 」里面，而「哈希表 1」 则不再进行任何添加操作，这样保证了「哈希表 1 」的 key-value 数量只会减少，随着 rehash 操作的完成，最终「哈希表 1 」就会变成空表。
 
 
+
+
+
 ## 5 zset
+
+zadd  <key><score1><value1><score2><value2>…
+将一个或多个 member 元素及其 score 值加入到有序集 key 当中。
+
+    zrange <key><start><stop>  [WITHSCORES]   
+返回有序集 key 中，下标在<start><stop>之间的元素
+带WITHSCORES，可以让分数一起和值返回到结果集。
+
+    zrangebyscore key minmax [withscores] [limit offset count]
+返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )的成员。有序集成员按 score 值递增(从小到大)次序排列。 
+
+    zrevrangebyscore key maxmin [withscores] [limit offset count]               
+同上，改为从大到小排列。 
+
+    zincrby <key><increment><value>      为元素的score加上增量
+
+    zrem  <key><value>删除该集合下，指定值的元素 
+
+    zcount <key><min><max>统计该集合，分数区间内的元素个数 
+
+    zrank <key><value>返回该值在集合中的排名，从0开始。
+
+## data structure
+    
 zset底层使用了两个数据结构
 （1）hash，hash的作用就是关联元素value和权重score，保障元素value的唯一性，可以通过元素value找到相应的score值。
 （2）跳跃表，跳跃表的目的在于给元素value排序，根据score的范围获取元素列表。
+
+
+```
+typedef struct zset {
+    dict *dict;
+    zskiplist *zsl;
+} zset;
+```
+Zset 对象能支持范围查询（如 ZRANGEBYSCORE 操作），这是因为它的数据结构设计采用了跳表，而又能以常数复杂度获取元素权重（如 ZSCORE 操作），这是因为它同时采用了哈希表进行索引。
+
+### 跳表：
+
+https://zhuanlan.zhihu.com/p/109946103
+![image](https://user-images.githubusercontent.com/42630862/146865893-fbd400ab-1ab8-41a8-82ac-5be95a6d8699.png)
+
+```
+typedef struct zskiplistNode {
+    //Zset 对象的元素值
+    sds ele;
+    //元素权重值
+    double score;
+    //后向指针
+    struct zskiplistNode *backward;
+
+    //节点的level数组，保存每层上的前向指针和跨度
+    struct zskiplistLevel {
+        struct zskiplistNode *forward;
+        unsigned long span;
+    } level[];
+} zskiplistNode;
+```
+
+
+```
+typedef struct zskiplist {
+    struct zskiplistNode *header, *tail;
+    unsigned long length;
+    int level;
+} zskiplist;
+```
+
+Zset 对象要同时保存元素和元素的权重，对应到跳表节点结构里就是 sds 类型的 ele 变量和 double 类型的 score 变量。每个跳表节点都有一个后向指针，指向前一个节点，目的是为了方便从跳表的尾节点开始访问节点，这样倒序查找时很方便。
 
 
 ## 6 hyperlog
