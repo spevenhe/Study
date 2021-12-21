@@ -1,6 +1,9 @@
 # redis 数据结构
 https://mp.weixin.qq.com/s/MGcOl1kGuKdA7om0Ahz5IA
 
+![image](https://user-images.githubusercontent.com/42630862/146923710-799c1aac-4dcc-4ae7-902d-c29571bd6ecc.png)
+
+
 ![image](https://user-images.githubusercontent.com/42630862/146705535-3c742c9a-149d-499a-b267-6ebd2c60a7c0.png)
 
 
@@ -92,14 +95,14 @@ lset<key><index><value>将列表key下标为index的值替换成value
 
 **3.0之前**
 数据量小 压缩列表
-数据量大 双向快速链表
+数据量大 双向链表
 
 ### 原因
 
 链表的缺陷也是有的，链表每个节点之间的内存都是不连续的，意味着无法很好利用 CPU 缓存。
 
 能很好利用 CPU 缓存的数据结构就是数组，因为数组的内存是连续的，这样就可以充分利用 CPU 缓存来加速访问。
-
+ 
 因此，Redis 的 list 数据类型在数据量比较少的情况下，会采用「压缩列表」作为底层数据结构的实现，压缩列表就是由数组实现的，下面我们会细说压缩列表。
 
 ### 压缩列表
@@ -107,7 +110,8 @@ lset<key><index><value>将列表key下标为index的值替换成value
 
 当一个列表键（list）只包含少量的列表项，并且每个列表项都是小整数值，或者长度比较短的字符串，那么 Redis 就会使用压缩列表作为列表键（list）的底层实现。
 
-当一个哈希键（hash）只包含少量键值对，并且每个键值对的键和值都是小整数值，或者长度比较短的字符串，那么 Redis 就会使用压缩列表作为哈希键（hash）的底层实现。
+当一个哈希键（hash）只包
+ 含少量键值对，并且每个键值对的键和值都是小整数值，或者长度比较短的字符串，那么 Redis 就会使用压缩列表作为哈希键（hash）的底层实现。
 
 压缩列表是 Redis 为了节约内存而开发的，它是由连续内存块组成的顺序型数据结构，有点类似于数组。
 
@@ -172,8 +176,41 @@ encoding，记录了当前节点实际数据的类型以及长度；
 data，记录了当前节点的实际数据；
   
 **3.2之后**
-  
-  ## quicklist
+## quicklist
+
+```
+ typedef struct quicklist {
+    //quicklist的链表头
+    quicklistNode *head;      //quicklist的链表头
+    //quicklist的链表头
+    quicklistNode *tail; 
+    //所有压缩列表中的总元素个数
+    unsigned long count;
+    //quicklistNodes的个数
+    unsigned long len;       
+    ...
+} quicklist;
+ 
+ 
+ typedef struct quicklistNode {
+    //前一个quicklistNode
+    struct quicklistNode *prev;     //前一个quicklistNode
+    //下一个quicklistNode
+    struct quicklistNode *next;     //后一个quicklistNode
+    //quicklistNode指向的压缩列表
+    unsigned char *zl;              
+    //压缩列表的的字节大小
+    unsigned int sz;                
+    //压缩列表的元素个数
+    unsigned int count : 16;        //ziplist中的元素个数 
+    ....
+} quicklistNode;
+ 
+```
+![image](https://user-images.githubusercontent.com/42630862/146890662-2b79f078-d174-41c7-bf4c-fba77a7d6a99.png)
+
+ 
+ 
 
 ## 3 Set
 
@@ -357,7 +394,22 @@ typedef struct zskiplist {
 
 Zset 对象要同时保存元素和元素的权重，对应到跳表节点结构里就是 sds 类型的 ele 变量和 double 类型的 score 变量。每个跳表节点都有一个后向指针，指向前一个节点，目的是为了方便从跳表的尾节点开始访问节点，这样倒序查找时很方便。
 
+ 随机层数
+对于每一个新插入的节点，都需要调用一个随机算法给它分配一个合理的层数，源码在 t_zset.c/zslRandomLevel(void) 中被定义：
+```
+int zslRandomLevel(void) {
+    int level = 1;
+    while ((random()&0xFFFF) < (ZSKIPLIST_P * 0xFFFF))
+        level += 1;
+    return (level<ZSKIPLIST_MAXLEVEL) ? level : ZSKIPLIST_MAXLEVEL;
+}
+ ```
+直观上期望的目标是 50% 的概率被分配到 Level 1，25% 的概率被分配到 Level 2，12.5% 的概率被分配到 Level 3，以此类推...有 2-63 的概率被分配到最顶层，因为这里每一层的晋升率都是 50%。
 
+Redis 跳跃表默认允许最大的层数是 32，被源码中 ZSKIPLIST_MAXLEVEL 定义，当 Level[0] 有 264 个元素时，才能达到 32 层，所以定义 32 完全够用了。
+
+ 
+ 
 ## 6 hyperlog
 HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。
 在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同元素的基数。这和计算基数时，元素越多耗费内存就越多的集合形成鲜明对比。
