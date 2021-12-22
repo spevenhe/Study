@@ -465,7 +465,9 @@ georadius<key>< longitude><latitude>radius  m|km|ft|mi   以给定的经纬度�
  
  
 # redis 内存
-
+ 
+https://mp.weixin.qq.com/s/CBfQEzEfjpbHocsg5QYBzQ
+ 
 4.6.2.	maxmemory 
 
 	建议必须设置，否则，将内存占满，造成服务器宕机
@@ -490,6 +492,14 @@ georadius<key>< longitude><latitude>radius  m|km|ft|mi   以给定的经纬度�
 	volatile-ttl：移除那些TTL值最小的key，即那些最近要过期的key
 
 	noeviction：不进行移除。针对写操作，只是返回错误信息
+ 
+**4.0** •volatile-lfu：在设置了过期时间的key中使用LFU算法淘汰key•allkeys-lfu：在所有的key中使用LFU算法淘汰数据
+ 
+ LRU(Least Recently Used)，即最近最少使用，是一种缓存置换算法。在使用内存作为缓存的时候，缓存的大小一般是固定的。当缓存被占满，这个时候继续往缓存里面添加数据，就需要淘汰一部分老的数据，释放内存空间用来存储新的数据。这个时候就可以使用LRU算法了。其核心思想是：如果一个数据在最近一段时间没有被用到，那么将来被使用到的可能性也很小，所以就可以被淘汰掉。
+ 
+ LFU算法是Redis4.0里面新加的一种淘汰策略。它的全称是Least Frequently Used，它的核心思想是根据key的最近被访问的频率进行淘汰，很少被访问的优先被淘汰，被访问的多的则被留下来。LFU算法能更好的表示一个key被访问的热度。假如你使用的是LRU算法，一个key很久没有被访问到，只刚刚是偶尔被访问了一次，那么它就被认为是热点数据，不会被淘汰，而有些key将来是很有可能被访问到的则被淘汰了。如果使用LFU算法则不会出现这种情况，因为使用一次并不会使一个key成为热点数据。LFU一共有两种策略：
+
+
  
 4.6.4.	maxmemory-samples
 
