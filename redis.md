@@ -493,7 +493,7 @@ https://mp.weixin.qq.com/s/CBfQEzEfjpbHocsg5QYBzQ
 
 	noeviction：不进行移除。针对写操作，只是返回错误信息
  
-**4.0** •volatile-lfu：在设置了过期时间的key中使用LFU算法淘汰key•allkeys-lfu：在所有的key中使用LFU算法淘汰数据
+**4.0之后** •volatile-lfu：在设置了过期时间的key中使用LFU算法淘汰key•allkeys-lfu：在所有的key中使用LFU算法淘汰数据
  
  LRU(Least Recently Used)，即最近最少使用，是一种缓存置换算法。在使用内存作为缓存的时候，缓存的大小一般是固定的。当缓存被占满，这个时候继续往缓存里面添加数据，就需要淘汰一部分老的数据，释放内存空间用来存储新的数据。这个时候就可以使用LRU算法了。其核心思想是：如果一个数据在最近一段时间没有被用到，那么将来被使用到的可能性也很小，所以就可以被淘汰掉。
  
@@ -507,5 +507,37 @@ https://mp.weixin.qq.com/s/CBfQEzEfjpbHocsg5QYBzQ
 
 	一般设置3到7的数字，数值越小样本越不准确，但性能消耗越小。
 
+ # redis IO
+ 
+ 解决IO问题的最佳途径，使用集群版redis，使用集群 proxy来解决，以下还是针对于单节点
+  
+ 1. 4.0 之前 单线程
+ 
+ 2. 4.0 之后lazy free
+ 
+ 3. 6.0 多线程IO
+ 
+ ## 1. 4.0 之前 单线程
+ ![image](https://user-images.githubusercontent.com/42630862/147028940-8e1ed168-0768-41d3-91cd-44a5c1981570.png)
 
+ ![image](https://user-images.githubusercontent.com/42630862/147028958-0f646937-a9e5-41b0-ae07-6255d25e3761.png)
+
+ 
+ ## 2. 4.0 之后lazy free
+ 
+ 如上所知，Redis在处理客户端命令时是以单线程形式运行，而且处理速度很快，期间不会响应其他客户端请求，但若客户端向Redis发送一条耗时较长的命令，比如删除一个含有上百万对象的Set键，或者执行flushdb，flushall操作，Redis服务器需要回收大量的内存空间，导致服务器卡住好几秒，对负载较高的缓存系统而言将会是个灾难。为了解决这个问题，在Redis 4.0版本引入了Lazy Free，将慢操作异步化，这也是在事件处理上向多线程迈进了一步。
+
+如作者在其博客中所述，要解决慢操作，可以采用渐进式处理，即增加一个时间事件，比如在删除一个具有上百万个对象的Set键时，每次只删除大键中的一部分数据，最终实现大键的删除。但是，该方案可能会导致回收速度赶不上创建速度，最终导致内存耗尽。因此，Redis最终实现上是将大键的删除操作异步化，采用非阻塞删除（对应命令UNLINK），大键的空间回收交由单独线程实现，主线程只做关系解除，可以快速返回，继续处理其他事件，避免服务器长时间阻塞。
+
+以删除（DEL命令）为例，看看Redis是如何实现的，下面就是删除函数的入口，其中，lazyfree_lazy_user_del是是否修改DEL命令的默认行为，一旦开启，执行DEL时将会以UNLINK形式执行。
+ 
+ ## 3. 6.0 多线程IO
+ 
+ 
+![image](https://user-images.githubusercontent.com/42630862/147048543-c7f46a0f-d14e-425b-8437-dd60d4eaf363.png)
+
+ ![image](https://user-images.githubusercontent.com/42630862/147054087-d3a81e97-4ea2-4432-8380-54c06b77426f.png)
+
+ 
+ 
 
