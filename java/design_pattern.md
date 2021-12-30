@@ -77,6 +77,7 @@ Singleton instance = Singleton.INSTANCE;
 1) 工厂方法模式设计方案：将披萨项目的实例化功能抽象成抽象方法，在不同的口味点餐子类中具体实现。
 2) 工厂方法模式：定义了一个创建对象的抽象方法，由子类决定要实例化的类。工厂方法模式将对象的实例
 化推迟到子类。
+![image](https://user-images.githubusercontent.com/42630862/147737778-dd1e5806-7363-4c29-be35-f6d57f993229.png)
 
 
 3. 抽象工厂模式
@@ -85,7 +86,10 @@ Singleton instance = Singleton.INSTANCE;
 3) 从设计层面看，抽象工厂模式就是对简单工厂模式的改进(或者称为进一步的抽象)。
 4) 将工厂抽象成两层，AbsFactory(抽象工厂) 和具体实现的工厂子类。程序员可以根据创建对象类型使用对应
 的工厂子类。这样将单个的简单工厂类变成了工厂簇，更利于代码的维护和扩展。
+![image](https://user-images.githubusercontent.com/42630862/147737801-a3786b64-09e2-40e1-8220-d5200405b37f.png)
 
 
+
+# 代理模式
 
 
