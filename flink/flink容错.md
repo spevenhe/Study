@@ -84,12 +84,28 @@ RecoverableError: 可恢复错误。不属于上述类型的错误都暂设为�
 
 
 # flink容错之checkpoints
+exactly onec 实现
 
 ![image](https://user-images.githubusercontent.com/42630862/158554336-6e22cdc3-7e75-4f8e-9740-43e932a7043e.png)
  
- ![image](https://user-images.githubusercontent.com/42630862/158729012-0a164857-aa52-42ee-9324-11d561f4b8c3.png)
+![image](https://user-images.githubusercontent.com/42630862/158729012-0a164857-aa52-42ee-9324-11d561f4b8c3.png)
+
+## 检查点算法实现
+
+ ![image](https://user-images.githubusercontent.com/42630862/158729656-50bc2b44-31dd-49c6-abd5-83f0d1b25cd2.png)
+
+ ![image](https://user-images.githubusercontent.com/42630862/158731374-ba0a72b3-7c9e-4f92-b6b3-3c1bae5314f0.png)
 
 
+## 分布式检查点算法
+
+![image](https://user-images.githubusercontent.com/42630862/158787198-9178762a-02dc-40ed-9734-11efdf994d45.png)
+
+barrier独立于 数据，是jm发送的特殊标识，tm各个算子收到后将储存checkpoint到statebackend
+
+![image](https://user-images.githubusercontent.com/42630862/158789126-50beac62-4f8d-42d1-bea7-067c9cdf1c74.png)
+
+ 
 
 
 
