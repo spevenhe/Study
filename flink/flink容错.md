@@ -105,7 +105,7 @@ barrier独立于 数据，是jm发送的特殊标识，tm各个算子收到后�
 
 ![image](https://user-images.githubusercontent.com/42630862/158789126-50beac62-4f8d-42d1-bea7-067c9cdf1c74.png)
 
- 
+  
 
 
 
