@@ -14,3 +14,7 @@
 ![image](https://user-images.githubusercontent.com/42630862/166900546-bf93dce6-27e5-4dc4-a758-1712004444f6.png)
 ![image](https://user-images.githubusercontent.com/42630862/166900734-991ed09d-5e72-4062-b1fe-f5224f574482.png)
 ![image](https://user-images.githubusercontent.com/42630862/166900755-05ccedd1-1c0e-4e04-a284-2ce5356d730e.png)
+
+# 迭代器 iterator
+是一个抽象概念，理解为指向数据的指针
+主要作用 在于为所有的 container提供标准化的函数 
