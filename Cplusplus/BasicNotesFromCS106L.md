@@ -60,4 +60,10 @@
 
     最后一句应该写#endif   否则不需要引入
 
+![image](https://user-images.githubusercontent.com/42630862/167447762-a67e1a46-2d6e-4aa0-a86c-00c97fc100c4.png)
+
+## C++ Constructor後面的":"是什麼鬼意思？ (Initialization List 教學)
+https://vinesmsuic.github.io/2020/01/09/c++-initializationlists/#initializer-list
+
+
 
