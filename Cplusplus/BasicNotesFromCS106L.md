@@ -65,7 +65,17 @@
 ## C++ Constructor後面的":"是什麼鬼意思？ (Initialization List 教學)
 https://vinesmsuic.github.io/2020/01/09/c++-initializationlists/#initializer-list
 
-## template 模板类
+## template 
+## template 数据结构
+
+```     template <typename T>
+        T min(T a, T b) {
+            return (a < b) ? a : b;
+    }
+```
+
+
+## 模板类
 **template 类的 h文件，include 实现的 cpp，是一种优雅的方式**
 
 https://zhuanlan.zhihu.com/p/147623943
