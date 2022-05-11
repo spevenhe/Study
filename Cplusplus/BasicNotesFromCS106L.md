@@ -65,7 +65,10 @@
 ## C++ Constructor後面的":"是什麼鬼意思？ (Initialization List 教學)
 https://vinesmsuic.github.io/2020/01/09/c++-initializationlists/#initializer-list
 
-## template 
+## 类的调用
+
+https://blog.csdn.net/weicao1990/article/details/81630162
+# template 
 ## template 数据结构
 
 ```     
