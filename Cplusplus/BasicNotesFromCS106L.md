@@ -15,6 +15,17 @@
 ![image](https://user-images.githubusercontent.com/42630862/166900734-991ed09d-5e72-4062-b1fe-f5224f574482.png)
 ![image](https://user-images.githubusercontent.com/42630862/166900755-05ccedd1-1c0e-4e04-a284-2ce5356d730e.png)
 
+## const 函数
+![image](https://user-images.githubusercontent.com/42630862/167447762-a67e1a46-2d6e-4aa0-a86c-00c97fc100c4.png)
+![image](https://user-images.githubusercontent.com/42630862/167899644-e7278885-c100-4b19-9a89-a912087bfd54.png)
+
+![image](https://user-images.githubusercontent.com/42630862/167899680-f2202bf5-c127-4b0b-bbe6-fdedf5050343.png)
+![image](https://user-images.githubusercontent.com/42630862/167900046-9722a06b-d9e1-490a-9a50-33b677e1e6a4.png)
+
+![image](https://user-images.githubusercontent.com/42630862/167901279-c812f447-5f02-43d1-8abf-0508a079f61f.png)
+![image](https://user-images.githubusercontent.com/42630862/167901532-d03f9e6d-8f34-4e8f-83a8-c7f21fd911da.png)
+
+
 # 迭代器 iterator
 是一个抽象概念，理解为指向数据的指针
 主要作用 在于为所有的 container提供标准化的函数 
@@ -59,8 +70,10 @@
     接着的语句应该#define A_H  就引入a.h
 
     最后一句应该写#endif   否则不需要引入
+    
+    
 
-![image](https://user-images.githubusercontent.com/42630862/167447762-a67e1a46-2d6e-4aa0-a86c-00c97fc100c4.png)
+
 
 ## C++ Constructor後面的":"是什麼鬼意思？ (Initialization List 教學)
 https://vinesmsuic.github.io/2020/01/09/c++-initializationlists/#initializer-list
@@ -95,6 +108,9 @@ more descriptive name is usually better.
 
 ### important syntax
 ![image](https://user-images.githubusercontent.com/42630862/167888292-ba5f6ca8-3647-4c9c-b93a-0a2b35931237.png)
+
+### typename 关键字
+https://feihu.me/blog/2014/the-origin-and-usage-of-typename/
 
 **template 类的 h文件，include 实现的 cpp，是一种优雅的方式**
 
