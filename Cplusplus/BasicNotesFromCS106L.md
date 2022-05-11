@@ -68,14 +68,31 @@ https://vinesmsuic.github.io/2020/01/09/c++-initializationlists/#initializer-lis
 ## template 
 ## template 数据结构
 
-```     template <typename T>
+```     
+
+template <typename T>
         T min(T a, T b) {
             return (a < b) ? a : b;
     }
+    The template parameter name can be anything. I used T but a
+more descriptive name is usually better.
+
+    template <typename Type>
+        Type min(Type a, Type b) {
+        return (a < b) ? a : b;
+    }
+
+    
 ```
 
 
 ## 模板类
+
+![image](https://user-images.githubusercontent.com/42630862/167884788-afcb5661-06a8-44ed-b628-e7d7acbc9f44.png)
+
+### important syntax
+![image](https://user-images.githubusercontent.com/42630862/167888292-ba5f6ca8-3647-4c9c-b93a-0a2b35931237.png)
+
 **template 类的 h文件，include 实现的 cpp，是一种优雅的方式**
 
 https://zhuanlan.zhihu.com/p/147623943
