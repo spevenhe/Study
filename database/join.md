@@ -42,5 +42,5 @@ This library will provide a set of API and mechinism which is easy for user to u
 Non-join columns -> Table
 join columns -> HashTable
 
-
+reuse buffer and multi thread
 
