@@ -21,4 +21,12 @@
 ## 1.2 tidb hash join
 https://pingcap.com/zh/blog/tidb-source-code-reading-9
 
+### 1.2.1 构建 Hash Join 执行器
 
+TiDB 首先会根据 SQL 来构建相应的 Logic Plan；
+
+然后将 Logic Plan 转成 Physical Plan，这里是转成 PhysicalHashJoin 作为 Physical Plan；
+
+通过比较 Physical Plan 的代价，最后选择一个代价最小的 Physical Plan 构建执行器 executor；
+
+代价计算 根据数据量做一个估算
