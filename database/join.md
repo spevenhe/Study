@@ -18,4 +18,7 @@
 ![image](https://user-images.githubusercontent.com/42630862/179877165-cc0013cb-5a7c-4a7f-aa8b-fe6fcef7f2af.png)
 
 
+## 1.2 tidb hash join
+https://pingcap.com/zh/blog/tidb-source-code-reading-9
+
 
