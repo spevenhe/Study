@@ -30,3 +30,17 @@ TiDB 首先会根据 SQL 来构建相应的 Logic Plan；
 通过比较 Physical Plan 的代价，最后选择一个代价最小的 Physical Plan 构建执行器 executor；
 
 代价计算 根据数据量做一个估算
+
+
+## 1.3 Cider join
+This library will provide a set of API and mechinism which is easy for user to use. 
+1. User should prepare a CiderBatch (which will be entire right table to be hashed) before call ComipleModule::compile method, 
+2. and pass this CiderBatch as input of ComipleModule::compile method. Cider library will handle hash table build and other stuff internally. 
+3. after that, user will get a compilationResult, and should build a CiderRuntimeModule. 
+4. When user call CiderRuntimeModule::processNextBatch(), just as usual, set left table(should convert to CiderBatch) as first input parameter, and user could get result for this batch join. Please check example use case. 
+
+Non-join columns -> Table
+join columns -> HashTable
+
+
+
