@@ -44,3 +44,16 @@ join columns -> HashTable
 
 reuse buffer and multi thread
 
+## 1.4 omnisci hash join
+eliminate the inner loop from a loop join and replace it with a hash table lookup
+
+A hash join buffer can have up to four sections which are **_located consecutively_** in memory:
+
+Keys
+
+Offsets
+
+Counts
+
+Payloads
+
