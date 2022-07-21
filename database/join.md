@@ -47,13 +47,25 @@ reuse buffer and multi thread
 ## 1.4 omnisci hash join
 eliminate the inner loop from a loop join and replace it with a hash table lookup
 
+
+### hash join buffers
 A hash join buffer can have up to four sections which are **_located consecutively_** in memory:
 
+**keys offsets counts** are reletaed
+
 Keys
+is an array containing the hashable keys from the key/value pairs to be stored in the hash table.
 
 Offsets
-
+ is an array containing integer indexes into the Payloads section.
+ 
 Counts
+is an array containing the integer sizes of the subarrays stored in the Payloads section.
 
 Payloads
+ is an array of subarrays, with each subarray containing one or more row ID integer references for rows in the one of the join tables. 
+
+
+### Kinds of Hash Join
+
 
