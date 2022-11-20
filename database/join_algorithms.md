@@ -53,14 +53,56 @@ DSM column store
 
 ![image](https://user-images.githubusercontent.com/42630862/202906812-0ad03b87-27cf-492e-85c9-788407547da1.png)
 
+## 3.1 hash function
 **对于double float, 就要避免collison rate, 对int bigint简易的很容易perfect hashing**
 **目前andy pavlo talked to 的 database system 跟company, just pick one hash function,对所有的data benchmark,
-nobody nobody nobody使用adaptive hash function**
+nobody nobody nobody使用adaptive hash function/hash table schema**
+
 ![image](https://user-images.githubusercontent.com/42630862/202907257-9abdc353-9c8c-4a3d-8d18-ed0e8395b356.png)
 
 
 ![image](https://user-images.githubusercontent.com/42630862/202906942-88ef8900-4c19-449d-887a-55784ea71f2c.png)
 
+## 3.2 HASHING SCHEMES
 
+![image](https://user-images.githubusercontent.com/42630862/202907758-ee0b8625-ac9f-45e6-8577-d67ee4f6fcbe.png)
+
+### 3.2.1 CHAINED HASHING 适合
+
+加入bloom filter 做优化， bloom filter 储存在bucket pointer 内，因为intel 使用48bit 作为实际的pointer?
+![image](https://user-images.githubusercontent.com/42630862/202907888-97e8f45d-050b-4ffc-bf06-f47713ad6900.png)
+
+### 3.2.2 LINEAR PROBE HASHING 不适合
+![image](https://user-images.githubusercontent.com/42630862/202908100-2b983e9e-ac8d-42cd-aa4d-a341a9e51132.png)
+![image](https://user-images.githubusercontent.com/42630862/202908242-1b5818b3-6248-4d10-abc2-1a80e73084b7.png)
+
+### 3.2.3 ROBIN HOOD HASHING 不适合
+
+![image](https://user-images.githubusercontent.com/42630862/202908359-385a2604-b11a-4381-8ff4-d9d555262c23.png)
+
+![image](https://user-images.githubusercontent.com/42630862/202908334-1ac69e45-f559-4f75-8602-f394175c4217.png)
+
+### 3.2.4 ROBIN HOOD HASHING 不适合
+### 3.2.5 CUCKOO HASHING 不适合
+![image](https://user-images.githubusercontent.com/42630862/202908563-c48fb978-368b-4997-8382-add09fb94a1f.png)
+
+# 4 PROBE PHASE
+![image](https://user-images.githubusercontent.com/42630862/202910429-65bf80f0-0dad-4f58-8688-bc572c6c0cf1.png)
+
+![image](https://user-images.githubusercontent.com/42630862/202910434-b35c48fb-ece8-4882-bd06-ce5581e6b877.png)
+
+# benchmark
+
+![image](https://user-images.githubusercontent.com/42630862/202910807-222e8a96-9f5c-4034-b208-92e1c87787e8.png)
+
+![image](https://user-images.githubusercontent.com/42630862/202910845-3a1adab7-6c91-440e-8256-c3b59742bf5d.png)
+
+
+![image](https://user-images.githubusercontent.com/42630862/202910937-d464c3d7-0350-4d8f-9142-0d4b94d849f5.png)
+
+![image](https://user-images.githubusercontent.com/42630862/202911479-3aff80b9-e8f6-40f6-b69f-f0e920dbfb15.png)
+
+
+![image](https://user-images.githubusercontent.com/42630862/202911545-31fff878-a143-44af-a034-8a5074aabeb7.png)
 
 
