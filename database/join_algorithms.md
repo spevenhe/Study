@@ -93,6 +93,8 @@ nobody nobody nobody使用adaptive hash function/hash table schema**
 
 # benchmark
 
+andy 说很难超过 hyper 的 linear probe hashing
+
 ![image](https://user-images.githubusercontent.com/42630862/202910807-222e8a96-9f5c-4034-b208-92e1c87787e8.png)
 
 ![image](https://user-images.githubusercontent.com/42630862/202910845-3a1adab7-6c91-440e-8256-c3b59742bf5d.png)
@@ -105,4 +107,5 @@ nobody nobody nobody使用adaptive hash function/hash table schema**
 
 ![image](https://user-images.githubusercontent.com/42630862/202911545-31fff878-a143-44af-a034-8a5074aabeb7.png)
 
+![image](https://user-images.githubusercontent.com/42630862/202911742-40bcdced-0bc3-4340-980b-151f67c8874e.png)
 
