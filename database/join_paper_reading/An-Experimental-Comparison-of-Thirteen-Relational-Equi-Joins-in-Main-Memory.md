@@ -30,4 +30,5 @@ PVLDB, 8(4):353–364, 2014.
 4. 对于velox 下发的，目前是 private partition + merge 
 5. 对于 data 超过 memory 大小，使用递归 partition hash join/ grace hash join
 6. 对于 multi core, 充分利用性能，使用partition hash  join
+## 7. 查看multi core hash join algorithm的具体实现，hyper bloom filter
 
