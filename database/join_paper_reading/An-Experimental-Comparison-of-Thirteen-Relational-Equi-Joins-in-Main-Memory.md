@@ -28,5 +28,6 @@ PVLDB, 8(4):353–364, 2014.
 2. 基本上不能使用 partition
 3. build 的 hash table schema，使用 chained + bloom filter
 4. 对于velox 下发的，目前是 private partition + merge 
-5. 
+5. 对于 data 超过 memory 大小，使用递归 partition hash join/ grace hash join
+6. 对于 multi core, 充分利用性能，使用partition hash  join
 
