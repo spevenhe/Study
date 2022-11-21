@@ -27,3 +27,6 @@ PVLDB, 8(4):353–364, 2014.
 1. 不能使用 radix hash, 首先 radix hashing 需要知道全部的数据，velox 是一批批传下来的，
 2. 基本上不能使用 partition
 3. build 的 hash table schema，使用 chained + bloom filter
+4. 对于velox 下发的，目前是 private partition + merge 
+5. 
+
