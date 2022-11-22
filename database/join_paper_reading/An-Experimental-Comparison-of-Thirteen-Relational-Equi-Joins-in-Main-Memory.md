@@ -32,3 +32,4 @@ PVLDB, 8(4):353–364, 2014.
 6. 对于 multi core, 充分利用性能，使用partition hash  join
 ## 7. 查看multi core hash join algorithm的具体实现，hyper bloom filter
 
+对于 partition 的probe 阶段 也会partition
