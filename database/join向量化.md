@@ -18,8 +18,9 @@
 
 ### 3. probe 过程
 向量化集中优化点
-1. linear probing 一类hashtable. 垂直向量化
-向量化实现较为复杂：参考Rethinking SIMD Vectorization for In-Memory Databases
+1. linear probing 一类hashtable. 垂直向量化 或 水平向量化
+垂直向量化实现较为复杂：参考Rethinking SIMD Vectorization for In-Memory Databases
+水平向量化 用一个batch 记录没有match的，下次将没有match的hash index+1
 
 2. chained 一类hashtable. 水平向量化
 向量化实现较为方便，但是如果chained 的深度不够，可能吞吐上不去
