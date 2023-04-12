@@ -82,7 +82,17 @@ Flavor-based policies take precedence over image-based policies. For example, if
 ![image](https://user-images.githubusercontent.com/42630862/231388725-1e523a5f-7826-44b3-bc3f-446e6415b3c2.png)
 
 # 4. instance emulator thread pinning policies (模拟器（underlying hypervisor）CPU线程绑定)
+![image](https://user-images.githubusercontent.com/42630862/231391503-f8fca239-0990-4805-941a-530ff5b5dfd5.png)
+
+# 5. Customizing instance CPU topologies
+
+![image](https://user-images.githubusercontent.com/42630862/231392671-09f7dbf6-285b-4948-8905-790c924303fd.png)
 
 
+# 6 Configuring libvirt compute nodes for CPU pinning
+nova 对于宿主机的cpu 有两种管理方式，对于没有绑定的，使用vcpu， 并且可以过量分配，对于绑定的cpu， 使用pcpu。
+![image](https://user-images.githubusercontent.com/42630862/231394126-1815fe07-84fa-490e-931b-07dd098e0d31.png)
+
+# 7 Configuring CPU power management for dedicated cores
 
 
