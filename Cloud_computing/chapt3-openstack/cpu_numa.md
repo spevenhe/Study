@@ -10,6 +10,8 @@ Background knowledge supplemnts:
 SMP 的典型特征为**「多个处理器共享一个集中式存储器」**，且每个处理器访问存储器的时间片相同，使得工作负载能够均匀的分配到所有可用处理器上
 
 ![image](https://user-images.githubusercontent.com/42630862/231361825-3f6e87d7-1aaa-4bc4-98ad-49cb549b98ee.png)
+![image](https://user-images.githubusercontent.com/42630862/231365917-fd0c02ca-3037-4dc0-9f39-05074e9d957f.png)
+
 
 ## 2 NUMA 非统一内存访问结构
 
@@ -19,11 +21,20 @@ SMP 的典型特征为**「多个处理器共享一个集中式存储器」**，
 
 ![image](https://user-images.githubusercontent.com/42630862/231362241-03ab17c3-6182-4de8-becc-0a5a49c0d81b.png)
 
-## 3 MPP 
+## 3 SMT
+SMT架构
+SMT（Simultaneous Multithreading，同步多线程）是一种将硬件多线程与超标量处理器技术相结合的处理器设计。SMT把CPU的每个物理内核拆分为虚拟内核，这些虚拟内核被称为线程，这样做是为了提高性能并允许每个内核一次运行两个指令流。
+
+SMT是SMP架构的设计补充。SMP架构中的CPU共享一条总线和存储，而SMT架构中CPU共享更多的组件。共享组件的CPU被称为Siblings。所有的CPU在系统上都显示为可用CPU，并且可以执行工作负载。但是，与NUMA一样，都会有线程竞争共享资源的情况。
+
+Intel Hyper-Threading Technolog（超线程技术）和SMT完全一样，都是允许在每个内核上运行多个线程。
+
+## 4 MPP 
 MPP（Massive Parallel Processing，大规模并行处理），既然 NUMA 扩展性的限制是没有完全实现资源（e.g. 存储器、互联模块）的隔离性，那么 MPP 的解决思路就是为处理器提供彻底的独立资源。
 
 MPP 拥有多个真正意义上的独立的 SMP 单元，每个 SMP 单元独占并只会访问自己本地的内存、I/O 等资源，SMP 单元间通过节点互联网络进行连接（Data Redistribution，数据重分配），是一个完全无共享（Share Nothing）的 CPU 计算平台结构。
 ![image](https://user-images.githubusercontent.com/42630862/231362764-bb6592dc-c0f6-43be-976c-cdc1e54e8d41.png)
+
 
 # numa 概念
 Node：包含有若干个 Socket 的组
@@ -60,5 +71,7 @@ preferred：宽松地为进程指定一个优先 node，如果优先 node 上没
 membind：规定进程只能从指定的若干个 node 上请求访问内存，并不严格规定只能访问本地内存
 
 interleave：规定进程可以使用 RR 算法轮转地从指定的若干个 node 上请求访问内存
+
+因为NUMA默认的内存分配策略是localalloc，优先在进程所在CPU的本地内存中分配，会导致CPU节点之间内存分配不均衡，当某个CPU节点的内存不足时，会导致Swap产生，而不是从远程节点分配内存。这就是所谓的Swap Insanity现象。
 
 
