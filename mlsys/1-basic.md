@@ -7,3 +7,13 @@
 # paper about real world ml production
 150 successful machine learning models: 6 lessons learned at Booking.com
 https://blog.kevinhu.me/2021/04/25/25-Paper-Reading-Booking.com-Experiences/bernardi2019.pdf
+
+# ML system requirement
+reliable, scalable, maintainable, and adaptable.
+
+## reliability
+区别传统应用，web 会返回404 code 等， ml 应用发生错误会悄无生息，比如一直全部 输出 false 或0 
+
+## scalability
+autoscaling
+
