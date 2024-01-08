@@ -24,3 +24,9 @@ WHERE City = 'Stanford' AND Month = 'July';
 
 
 ![image](https://github.com/spevenhe/Study/assets/42630862/5c89eef8-aa04-41e2-a138-4638027cfa18)
+
+ETL
+![image](https://github.com/spevenhe/Study/assets/42630862/58fa710f-9ef3-4fea-bcd4-5e78cc5592d8)
+
+
+曾经有个想法，etl，存所有数据到data lake，不维护schema， 使用的时候再load。但是数据规模大之后就不行了，搜索原始数据效率过低
