@@ -1,3 +1,16 @@
+# 特征工程的最佳实践
+1. Split data by time instead of doing it randomly.
+2. If you oversample your data, do it after splitting.
+3. Use statistics/info from the train split, instead of the entire data, for feature engineering: scaling, normalizing, handling missing values, creating n-gram count, item encoding, etc.
+4. Understand how your data is generated, collected, and processed. Involve domain experts if necessary.
+5. Keep track of data lineage.
+6. Understand feature importance to your model.
+7. Measure correlation between features and labels.
+8. Use features that generalize well.
+9. Remove stale features from your models.
+
+
+
 # Data Augmentation	
 ## Simple Label-Preserving Transformations	
 ![image](https://github.com/spevenhe/Study/assets/42630862/dce8ecc6-9c48-4b6c-a848-3c3aafdf0c5b)
@@ -86,7 +99,6 @@ Positional Embeddings 来自于 论文 Attention Is All You Need https://arxiv.o
 **positional embedding has become a standard data engineering technique for many applications in both computer vision and natural language processing**
 
 ![image](https://github.com/spevenhe/Study/assets/42630862/07e4f640-71ca-438e-94cc-39a354ae8dec)
-
 
 
 
