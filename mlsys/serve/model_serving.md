@@ -1,3 +1,16 @@
+# model serve metrics
+![image](https://github.com/spevenhe/Study/assets/42630862/e6446c04-d920-4e47-b057-0cfb8b85134c)
+![image](https://github.com/spevenhe/Study/assets/42630862/75c74bd0-60ab-493d-839d-d096c1673df3)
+
+![image](https://github.com/spevenhe/Study/assets/42630862/3a34735e-6527-4343-a7a9-6938a400f806)
+
+![image](https://github.com/spevenhe/Study/assets/42630862/e168be88-3605-40fd-baa1-37b0ea26193a)
+
+
+![image](https://github.com/spevenhe/Study/assets/42630862/7e29fb6c-1933-4b84-9def-904a0594fe30)
+![image](https://github.com/spevenhe/Study/assets/42630862/3ada9762-3091-420c-a0a1-191879bab261)
+
+
 # model server 有两种方式 1. 仿照web serve.   2. 基于cloud serve
 
 ## web serve
