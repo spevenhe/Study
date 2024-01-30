@@ -61,7 +61,30 @@ scikit-learn with auto-sklearn, TensorFlow with Keras Tuner, Ray with Tune
 
 https://zhuanlan.zhihu.com/p/266939342#:~:text=%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%94%A8%E5%A4%A7%E9%87%8F%E7%9A%84,%E5%8F%82%E6%95%B0%EF%BC%88%E5%A6%82%E5%AD%A6%E4%B9%A0%E7%8E%87%EF%BC%8Cbatch
 
+# Distributed Training
+
+## Data Parallelism
+做法：
+![image](https://github.com/spevenhe/Study/assets/42630862/c0e31aea-da02-4761-b92c-7c1038c5ebe2)
+
+梯度更新有两种方式：
+![image](https://github.com/spevenhe/Study/assets/42630862/6c51a076-ff58-4e25-a970-dbb3a4f5b8f0)
+How to aggregate gradient updates?
+
+Synchronous: have to wait for stragglers
+
+Asynch: gradients become stale
 
 
 
+## Model Parallelism
+![image](https://github.com/spevenhe/Study/assets/42630862/0083ecae-c4b0-4937-8ff5-66fb6c73f20d)
+
+
+
+![image](https://github.com/spevenhe/Study/assets/42630862/2ebde628-6c46-463e-a1c5-11ae3cf08c53)
+
+![image](https://github.com/spevenhe/Study/assets/42630862/0b6669f2-9054-4e72-afd5-6282507824bb)
+
+![image](https://github.com/spevenhe/Study/assets/42630862/954640b1-cf10-4d3a-b9e5-0fe5bf97882e)
 
