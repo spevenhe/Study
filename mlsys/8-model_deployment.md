@@ -22,5 +22,13 @@ batch 跑批需要针对所有用户，而实时只针对访问的用户
 
 
 # Model Compression
-1. Low-rank Factorization
-2. 
+1. Low-rank Factorization: 低秩矩阵分解
+2. Knowledge Distillation: a small model (student) is trained to mimic a larger model or ensemble of models
+3. Pruning: find parameters least useful to predictions and set them to 0.
+4. Quantization: using fewer bits to represent its parameters
+
+
+
+
+
+
