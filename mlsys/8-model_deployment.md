@@ -28,6 +28,8 @@ batch 跑批需要针对所有用户，而实时只针对访问的用户
 4. Quantization: using fewer bits to represent its parameters
 
 
+# ML on the Cloud and on the Edge
+
 
 
 
