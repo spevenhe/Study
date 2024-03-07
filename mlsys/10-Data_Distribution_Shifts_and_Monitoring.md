@@ -15,8 +15,11 @@ Concept drift, also known as posterior shift, is when the input distribution rem
 
 
 ## General Data Distribution Shifts	18
+![image](https://github.com/spevenhe/Study/assets/42630862/1dd08956-76cf-49da-a0e7-36cfdfe1da47)
 
-##Handling Data Distribution Shifts	19
+
+## Handling Data Distribution Shifts	19
+
 
 Detecting Data Distribution Shifts	20
 Statistical methods	20
